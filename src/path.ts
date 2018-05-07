@@ -221,4 +221,23 @@ export class Path {
     }
     return closestAp;
   }
+
+  public load(dv: DataView, off:number):number {
+    this.startPos.X = dv.getFloat64(off,true); off+=8;
+    this.startPos.Y = dv.getFloat64(off,true); off+=8;
+    this.startVel.X = dv.getFloat64(off,true); off+=8;
+    this.startVel.Y = dv.getFloat64(off,true); off+=8;
+    this.accelerationPoints = [];
+    var numPoints = dv.getInt32(off); off+=4;
+    for ( var i=0 ; i<numPoints ; i++ ) {
+      var ap = {} as AccelerationPoint;
+      ap.pointIdx = dv.getInt32(off); off+=4;
+      ap.type = dv.getInt32(off); off+=4;
+      ap.angle = dv.getFloat64(off,true); off += 8;
+      ap.mag = dv.getFloat64(off,true); off += 8;
+      this.accelerationPoints.push(ap);
+    }
+    this.calcPoints()
+    return off;
+  }
 }
