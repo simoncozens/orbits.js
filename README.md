@@ -23,8 +23,8 @@ And open `index.html` in your browser.
 
 ## To do
 
-* Display and edit acceleration vectors
-* Load and save paths
+* Edit acceleration vectors
+* Save paths
 * Path animation
 
 ## Won't do

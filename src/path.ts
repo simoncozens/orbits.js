@@ -150,6 +150,32 @@ export class Path {
       }
     }
   }
+
+  public drawProgressivePath(pointIdx: number) {
+    var stopIdx = this.getStopPoint();
+    if (stopIdx > pointIdx) { stopIdx = pointIdx; }
+    console.log("Draw prog path until "+stopIdx);
+    Engine.ctx.beginPath();
+    Engine.ctx.strokeStyle = this.color;
+    for ( var i=0 ; i<=stopIdx ; i++ ) {
+      var x = Engine.modelToViewX(this.points[i].X);
+      var y = Engine.modelToViewY(this.points[i].Y);
+      var draw = false;
+      if (i != 0) {
+        var thrust = this.getThrustForPoint(i);
+        if ( thrust.getLength() != 0.0 ) { draw = true; }
+        if ( i > 170 ) draw = true;
+      }
+
+      if (draw) {
+        if (i==0) { Engine.ctx.moveTo(x,y); }
+        else { Engine.ctx.lineTo(x,y); }
+      }
+      console.log("Move to "+x+","+y)
+    }
+    Engine.ctx.stroke();
+  }
+
   public drawSelf(sel?) {
     var stopIdx = this.getStopPoint();
     var lastX; var lastY;
@@ -168,8 +194,36 @@ export class Path {
     Engine.ctx.stroke();
     var ap: AccelerationPoint;
     for (ap of this.accelerationPoints) {
-      // XXX
+      var i = ap.pointIdx;
+      var x = Engine.modelToViewX(this.points[i].X);
+      var y = Engine.modelToViewY(this.points[i].Y);
+      if (ap == sel) {
+        Engine.ctx.fillStyle = "#ffff00";
+      } else if (ap.type == AccType.Redirect) {
+        Engine.ctx.fillStyle = "#0000ff";
+      } else {
+        Engine.ctx.fillStyle = "#ff0000";
+      }
+      Engine.ctx.beginPath();
+      Engine.ctx.arc(x,y,this.size,0,2*Math.PI);
+      Engine.ctx.fill();
+      this.drawThrustLine(i);
+      if (ap.type == AccType.StopTrace) break;
     }
+  }
+
+  public drawThrustLine(pointIDX) {
+    if (pointIDX==-1) return;
+    var vec = this.getThrustForPoint(pointIDX);
+    if (vec.getLength() == 0.0) return;
+    vec.setLength(DISPLAY_THRUSTLINE_LENGTH);
+    var x = Engine.modelToViewX(this.points[pointIDX].X);
+    var y = Engine.modelToViewY(this.points[pointIDX].Y);
+    Engine.ctx.strokeStyle="#fff";
+    Engine.ctx.beginPath()
+    Engine.ctx.moveTo(x,y);
+    Engine.ctx.lineTo(x+vec.X,y+vec.Y);
+    Engine.ctx.stroke();
   }
 
   public getStopPoint() {
