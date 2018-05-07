@@ -1,0 +1,27 @@
+{
+  "name": "orbits.js",
+  "version": "1.0.0",
+  "description": "A Typescript port of Andy Weir's Orbits",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc && browserify --debug src/start.js -o src/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simoncozens/orbits.js.git"
+  },
+  "author": "Simon Cozens",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/simoncozens/orbits.js/issues"
+  },
+  "homepage": "https://github.com/simoncozens/orbits.js#readme",
+  "dependencies": {
+    "browserify": "^16.2.0",
+    "typescript": "^2.8.3"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.3.1"
+  }
+}
