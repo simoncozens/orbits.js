@@ -96,7 +96,34 @@ class EngineSingleton {
   }
 
   public drawPlayback() {
-
+    this.ctx.canvas.width = this.screenW;
+    this.ctx.canvas.height = this.screenH;
+    this.ctx.clearRect(0,0,this.screenW, this.screenH);
+    this.ctx.fillStyle = "#000";
+    this.ctx.fillRect(0,0,this.screenW, this.screenH);
+    this.sun.drawSelf();
+    this.earthPath.drawSelf();
+    this.marsPath.drawSelf();
+    this.ship.drawProgressivePath(this.playbackStepIdx);
+    this.ctx.fillStyle=this.earth.color;
+    this.drawPathObject(this.earthPath,this.playbackStepIdx);
+    this.ctx.fillStyle=this.mars.color;
+    this.drawPathObject(this.marsPath,this.playbackStepIdx);
+    this.ctx.fillStyle=this.ship.color;
+    this.drawPathObject(this.ship,this.playbackStepIdx);
+    var missionDay = this.playbackStepIdx+1;
+    var label = `Mission day: ${missionDay} `
+    if ( missionDay >= 133 )
+    {
+      // work out the sol
+      var sol = missionDay-132;
+      sol *= 86400.0;
+      sol /= 88775.24409;
+      label = label + `Sol: ${sol.toFixed(0)}`;
+    }
+    this.ctx.fillStyle="#ffffff";
+    this.ctx.font = "12px Arial";
+    this.ctx.fillText(label, 10,20);
   }
 
   public drawNormal() {
@@ -105,9 +132,6 @@ class EngineSingleton {
     this.ctx.clearRect(0,0,this.screenW, this.screenH);
     this.ctx.fillStyle = "#000";
     this.ctx.fillRect(0,0,this.screenW, this.screenH);
-    this.ctx.moveTo(0, 0);
-    this.ctx.lineTo(100, 100);
-    this.ctx.stroke();
     this.sun.drawSelf();
     this.earthPath.drawSelf();
     this.marsPath.drawSelf();
@@ -115,7 +139,7 @@ class EngineSingleton {
 
     if (this.hoverPathPointIdx != -1) {
       this.ctx.strokeStyle="#ff0000";
-      // this.ship.drawThrustLine(this.hoverPathPointIdx);
+      this.ship.drawThrustLine(this.hoverPathPointIdx);
       var daynum = (this.hoverPathPointIdx*86400)/POINTS_TIME + 1;
       var em = getDistance(this.earthPath.points[this.hoverPathPointIdx], this.marsPath.points[this.hoverPathPointIdx]);
       var eh = getDistance(this.earthPath.points[this.hoverPathPointIdx], this.ship.points[this.hoverPathPointIdx]);
@@ -140,10 +164,9 @@ class EngineSingleton {
     if (pointIdx > stopPoint) return;
     var x = this.modelToViewX(toDraw.points[pointIdx].X);
     var y = this.modelToViewY(toDraw.points[pointIdx].Y);
-    Engine.ctx.strokeStyle="#fff";
     Engine.ctx.beginPath();
     Engine.ctx.arc(x,y,5,0,2*Math.PI);
-    Engine.ctx.stroke();
+    Engine.ctx.fill();
 
   }
 
@@ -183,12 +206,34 @@ class EngineSingleton {
     this.drawSelf();
   }
 
+  public playbackTick() {
+    console.log("Tick!")
+    if (this.uiMode != UIMode.Playback) return;
+    var stopIdx = this.ship.getStopPoint();
+    if (this.playbackStepIdx <= stopIdx) {
+      this.drawSelf();
+      this.playbackStepIdx++;
+      setTimeout(() => this.playbackTick(), 100);
+    }
+  }
+
   public keyDown(evt) {
     var key = evt.key;
     if (key == "Shift") {
       this.hoverPathPointIdx = -1;
       this.hoverAccelPoint = null;
       this.uiMode = UIMode.AddingPoint;
+    }
+    if (key == " ") {
+      if (this.uiMode == UIMode.Inert) {
+        this.playbackStepIdx = 0;
+        this.uiMode = UIMode.Playback;
+        this.playbackTick();
+      } else {
+        this.uiMode = UIMode.Inert;
+      }
+    } else {
+      console.log(key)
     }
   }
 
