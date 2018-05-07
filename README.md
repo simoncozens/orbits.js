@@ -1,6 +1,8 @@
 # Orbits.js
 
-A partially complete port of Andy Weir's *Orbits* ([The Martin Trajectory App](https://github.com/the-martian-trajectory-app/trajectory)) to TypeScript.
+A partially complete port of Andy Weir's *Orbits* ([The Martian Trajectory App](https://github.com/the-martian-trajectory-app/trajectory)) to TypeScript.
+
+See it here: http://simoncozens.github.io/orbits.js/
 
 ## Running
 
