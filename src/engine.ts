@@ -154,8 +154,21 @@ class EngineSingleton {
     return `${dist.toFixed(0)}km, ${lightMinutes.toFixed(0)}m ${lightSeconds.toFixed(0)}s`;
   }
 
-  public load(data) {
-
+  public load(url) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'arraybuffer';
+    var that = this;
+    xhr.onload = function (e) {
+      // response is unsigned 8 bit integer
+      var dv = new DataView(this.response);
+      var off = 0;
+      off = that.earthPath.load(dv,off);
+      off = that.marsPath.load(dv,off);
+      off = that.ship.load(dv,off);
+      that.drawSelf();
+    };
+    xhr.send();
   }
 
   public mouseMove(evt) {
