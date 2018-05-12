@@ -58,7 +58,8 @@ class EngineSingleton {
     this.center = new Vector();
     var r = MARS_APOGEE*1.05;
     var width = r*2.0;
-    this.kmPerPixel = 2*width/this.screenW;
+    var narrowest = this.screenW < this.screenH ? this.screenW : this.screenH;
+    this.kmPerPixel = 1.2*width/narrowest;
     var sunPos = new Vector(); var sunVel = new Vector();
     this.sun = new OBObject(SUN_SGP, sunPos, sunVel, "#ffff00", 8, null);
     this.mars = new OBObject(0, new Vector(), new Vector(), "#ff7f7f", 1, this.sun);
@@ -89,6 +90,7 @@ class EngineSingleton {
   }
 
   public drawSelf() {
+    this.setupCanvas();
     if (this.uiMode == UIMode.Playback) {
       this.drawPlayback()
     } else {
@@ -96,7 +98,7 @@ class EngineSingleton {
     }
   }
 
-  public drawPlayback() {
+  public setupCanvas() {
     this.ctx.canvas.width = this.screenW;
     this.ctx.canvas.height = this.screenH;
     this.ctx.clearRect(0,0,this.screenW, this.screenH);
@@ -105,6 +107,9 @@ class EngineSingleton {
     this.sun.drawSelf();
     this.earthPath.drawSelf();
     this.marsPath.drawSelf();
+  }
+
+  public drawPlayback() {
     this.ship.drawProgressivePath(this.playbackStepIdx);
     this.ctx.fillStyle=this.earth.color;
     this.drawPathObject(this.earthPath,this.playbackStepIdx);
@@ -128,14 +133,6 @@ class EngineSingleton {
   }
 
   public drawNormal() {
-    this.ctx.canvas.width = this.screenW;
-    this.ctx.canvas.height = this.screenH;
-    this.ctx.clearRect(0,0,this.screenW, this.screenH);
-    this.ctx.fillStyle = "#000";
-    this.ctx.fillRect(0,0,this.screenW, this.screenH);
-    this.sun.drawSelf();
-    this.earthPath.drawSelf();
-    this.marsPath.drawSelf();
     this.ship.drawSelf(this.hoverAccelPoint);
 
     if (this.hoverPathPointIdx != -1) {
