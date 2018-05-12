@@ -48,6 +48,7 @@ class EngineSingleton {
       this.screenH = el.height();
       this.ctx = el[0].getContext("2d");
       $(el).on("mousemove", (e) => this.mouseMove(e) )
+      $(el).on("touchmove", (e) => this.mouseMove(e) )
       $(window).keydown( (e) => this.keyDown(e) )
       $(window).keyup( (e) => this.keyUp(e) )
     } else {
@@ -196,24 +197,38 @@ class EngineSingleton {
 
   public mouseMove(evt) {
     var rect = $("#canvas")[0].getBoundingClientRect();
-    var x =  evt.clientX - rect.left;
-    var y = evt.clientY - rect.top;
-    if (this.uiMode == UIMode.AddingPoint) {
+    var x = (evt.clientX||evt.touches[0].clientX) - rect.left;
+    var y = (evt.clientY||evt.touches[0].clientY) - rect.top;
+    // if (this.uiMode == UIMode.AddingPoint) {
       this.hoverPathPointIdx = this.ship.getNearestPointIdx(x,y);
-    } else {
+    // } else {
       this.hoverAccelPoint = this.ship.getNearestAccelPoint(x,y);
-    }
+    // }
     this.drawSelf();
+    evt.preventDefault();
   }
 
   public playbackTick() {
-    console.log("Tick!")
     if (this.uiMode != UIMode.Playback) return;
     var stopIdx = this.ship.getStopPoint();
     if (this.playbackStepIdx <= stopIdx) {
       this.drawSelf();
       this.playbackStepIdx++;
-      setTimeout(() => this.playbackTick(), 100);
+      setTimeout(() => this.playbackTick(), 320 - ($("#speed").val() as number));
+    } else {
+      this.playPause();
+    }
+  }
+
+  public playPause() {
+    if (this.uiMode != UIMode.Playback) {
+      this.playbackStepIdx = 0;
+      this.uiMode = UIMode.Playback;
+      this.playbackTick();
+      $("#pause").show(); $("#play").hide();
+    } else {
+      this.uiMode = UIMode.Inert;
+      $("#play").show(); $("#pause").hide();
     }
   }
 
@@ -225,15 +240,7 @@ class EngineSingleton {
       this.uiMode = UIMode.AddingPoint;
     }
     if (key == " ") {
-      if (this.uiMode == UIMode.Inert) {
-        this.playbackStepIdx = 0;
-        this.uiMode = UIMode.Playback;
-        this.playbackTick();
-      } else {
-        this.uiMode = UIMode.Inert;
-      }
-    } else {
-      console.log(key)
+      this.playPause();
     }
   }
 
