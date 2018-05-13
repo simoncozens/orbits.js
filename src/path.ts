@@ -120,7 +120,7 @@ export class Path {
     if(!this.points[0]) { this.points[0] = new Vector(); }
     this.points[0].set(pos);
     var halt = false;
-    for (var i = 0; i<= stopIdx; i++) {
+    for (var i = 1; i<= stopIdx; i++) {
       if (!this.points[i]) { this.points[i] = new Vector() }
       if (halt) { this.points[i].set(this.points[i-1]); continue }
       var grav = new Vector(); grav.set(this.orbitee.pos);
